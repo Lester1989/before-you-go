@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form class="max-w-md mx-auto" method="post" action="/checkin_date">
+        <label for="name" class="block mb-2">Article Name:</label>
+        <input type="text" id="name" name="name" value="{{ name }}" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4" />
+
+        <label for="storage_id" class="block mb-2">Storage:</label>
+        <select id="storage_id" name="storage_id" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4">
+            {% for storage in storages %}
+                <option value="{{ storage.id }}" {% if storage_id == storage.id %}selected{% endif %}>{{ storage.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="expiration_date" class="block mb-2">Expiration Date:</label>
+        <input type="date" id="expiration_date" name="expiration_date" placeholder="Enter expiration date" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4" />
+
+        <!-- Add your easy accessible calendar here -->
+        <div id="calendar">
+            <h3>{{this_month}}</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                        <th>Sun</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    {% for _ in range(first_of_month.weekday()) %}
+                        <td></td>
+                    {% endfor %}
+                    {% for day,day_data in days.items() %}
+                        {% if day_data[0] == first_of_month.month %}
+                            <td class="{% if day_data[2]<0 %}text-red-500{% endif %}">
+                                <button type="button" onclick="getElementById('expiration_date').value='{{day.strftime("%Y-%m-%d")}}'" {% if day_data[2]<0 %}disabled{% endif %}>
+                                    {{ day.strftime("%d.%m.") }} ({{ day_data[2] }})
+                                </button>
+                            </td>
+                            {% if day_data[1]==6 %}
+                                </tr>
+                                <tr>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    </tr>
+                </tbody>
+            </table> <h3>{{next_month}}</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                        <th>Sun</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    {% for _ in range(first_of_next_month.weekday()) %}
+                        <td></td>
+                    {% endfor %}
+                    {% for day,day_data in days.items() %}
+                        {% if day_data[0] == first_of_next_month.month %}
+                            <td>
+                                <button type="button" onclick="getElementById('expiration_date').value='{{day.strftime("%Y-%m-%d")}}'" >
+                                {{ day.strftime("%d.%m.") }} ({{ day_data[2] }})
+                                </button>
+                            </td>
+                            {% if day_data[1]==6 %}
+                                </tr>
+                                <tr>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Submit</button>
+    </form>
+{% endblock %}

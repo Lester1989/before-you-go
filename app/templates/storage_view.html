@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for storage in storages %}
+    <h2 class="text-2xl font-bold">{{ storage.name }}</h2>
+    <table class="mt-4 w-full border-collapse">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 bg-gray-200">Name</th>
+                <th class="py-2 px-4 bg-gray-200">Expiration Date</th>
+                <th class="py-2 px-4 bg-gray-200">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article in articles %}
+                {% if article.storage_id == storage.id %}
+                    <tr>
+                        <td class="py-2 px-4 border">{{ article.name }}</td>
+                        <td class="py-2 px-4 border">({{ article.days_left }} days remaining) {{ article.expiration_date.date() }}</td>
+                        <td class="py-2 px-4 border">
+                            <a href="/set_expiration/{{article.id}}/1" class="text-blue-500 hover:text-blue-700 mr-2">Tomorrow</a>
+                            </a>
+                            <a href="/set_expiration/{{article.id}}/3" class="text-blue-500 hover:text-blue-700 mr-2">Few days</a>
+                            <a href="/set_expiration/{{article.id}}/7" class="text-blue-500 hover:text-blue-700 mr-2">a Week</a>
+                            <a href="/remove_article/{{article.id}}" class="text-red-500 hover:text-red-700">
+                                <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}</a>
+{% endblock %}

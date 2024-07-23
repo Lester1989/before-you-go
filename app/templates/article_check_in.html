@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold mb-4">Check In Item</h1>
+        <form action="/checkin" method="POST">
+            <div class="mb-4">
+                <label for="barcode" class="block text-gray-700">Barcode:</label>
+                <input type="text" id="barcode" name="barcode" class="border border-gray-300 rounded px-4 py-2 w-full">
+            </div>
+            <div class="mb-4">
+                <label for="name" class="block text-gray-700">Name:</label>
+                <input type="text" id="name" name="name" class="border border-gray-300 rounded px-4 py-2 w-full">
+            </div>
+            <div class="mb-4">
+                <label for="storage_id" class="block text-gray-700">Storage:</label>
+                <select id="storage_id" name="storage_id" class="border border-gray-300 rounded px-4 py-2 w-full">
+                    {% for storage in storages %}
+                        <option value="{{ storage.id }}">{{ storage.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Check In</button>
+        </form>
+
+        <h2 class="text-xl font-bold mt-8">Existing Articles</h2>
+        <table class="mt-4">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Storage</th>
+                    <th>Expiration Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                    <tr>
+                        <td>{{ article.name }}</td>
+                        {% for storage in storages %}
+                            {% if storage.id == article.storage_id %}
+                                <td>{{ storage.name }}</td>
+                            {% endif %}
+                        {% endfor %}
+                        <td>{{ article.expiration_date }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "before-you-go"
+version = "0.1.0"
+description = ""
+authors = ["Lester <l.ester@gmx.de>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.1"
+Jinja2 = "^3.1.4"
+SQLAlchemy = "^2.0.31"
+uvicorn = "^0.30.3"
+sqlmodel = "^0.0.21"
+bcrypt = "^4.2.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
