@@ -14,11 +14,11 @@ class Article(SQLModel, table=True):
 
     @property
     def is_expired(self):
-        return self.expiration_date < datetime.today()+timedelta(days=1)
+        return self.expiration_date < datetime.today()+timedelta(days=-2)
     
     @property
     def days_left(self):
-        return (self.expiration_date - datetime.today()).days
+        return (self.expiration_date - datetime.today()).days +1
 
 class Storage(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -46,7 +46,9 @@ class UserStorage(SQLModel, table=True):
     user_id: Optional[int] = Field(default=None, foreign_key="user.id")
     storage_id: Optional[int] = Field(default=None, foreign_key="storage.id")
 
-
+class BarCodeCache(SQLModel, table=True):
+    barcode: str = Field(primary_key=True)
+    data: str
 
 
 def main():

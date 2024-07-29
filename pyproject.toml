@@ -14,6 +14,12 @@ uvicorn = "^0.30.3"
 sqlmodel = "^0.0.21"
 bcrypt = "^4.2.0"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+requests = "^2.32.3"
+openfoodfacts = "^1.1.1"
+pillow = "^10.4.0"
+pytest = "^8.3.2"
+pytest-cov = "^5.0.0"
+alembic = "^1.13.2"
 
 
 [build-system]

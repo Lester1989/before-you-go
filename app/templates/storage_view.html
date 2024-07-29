@@ -2,31 +2,55 @@
 
 {% block content %}
 {% for storage in storages %}
-    <h2 class="text-2xl font-bold">{{ storage.name }}</h2>
-    <table class="mt-4 w-full border-collapse">
-        <thead>
+    <h2 class="text-2xl font-bold px-4">
+        {{ storage.name }} 
+        <a href="/remove_storage/{{storage.id}}" class="text-red-500 hover:text-red-700">
+            <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </a>
+    </h2>
+    <table class="mt-4 mx-4 border-collapse" id="{{string_to_slug(storage.name)}}">
+        <thead class="dark:text-black">
             <tr>
-                <th class="py-2 px-4 bg-gray-200">Name</th>
-                <th class="py-2 px-4 bg-gray-200">Expiration Date</th>
-                <th class="py-2 px-4 bg-gray-200">Actions</th>
+                <th class="py-2 px-4 border bg-gray-200 w-1/2">{{ txt_article_name }}</th>
+                <th class="py-2 px-4 border bg-gray-200 w-1/4">{{ txt_expiration_date }}</th>
+                <th class="py-2 px-4 border bg-gray-200 w-1/4">{{ txt_actions }}</th>
             </tr>
         </thead>
         <tbody>
             {% for article in articles %}
                 {% if article.storage_id == storage.id %}
                     <tr>
-                        <td class="py-2 px-4 border">{{ article.name }}</td>
-                        <td class="py-2 px-4 border">({{ article.days_left }} days remaining) {{ article.expiration_date.date() }}</td>
-                        <td class="py-2 px-4 border">
-                            <a href="/set_expiration/{{article.id}}/1" class="text-blue-500 hover:text-blue-700 mr-2">Tomorrow</a>
-                            </a>
-                            <a href="/set_expiration/{{article.id}}/3" class="text-blue-500 hover:text-blue-700 mr-2">Few days</a>
-                            <a href="/set_expiration/{{article.id}}/7" class="text-blue-500 hover:text-blue-700 mr-2">a Week</a>
-                            <a href="/remove_article/{{article.id}}" class="text-red-500 hover:text-red-700">
-                                <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </a>
+                        <td class="py-2 px-4 border w-1/2">{{ article.name }}</td>
+                        {% if article.is_expired %}
+                            <td class="py-2 px-4 border w-1/4 text-red-500">({{ -article.days_left }} {{ txt_days_over_due }}) {{ article.expiration_date.date() }}</td>
+                        {% else %}
+                            <td class="py-2 px-4 border w-1/4">({{ article.days_left }} {{ txt_days_remaining }}) {{ article.expiration_date.date() }}</td>
+                        {% endif %}
+                        <td class="py-2 px-4 border w-1/4">
+                            <div class="flex flex-row">
+                                <a href="/set_expiration/{{article.id}}/1" class="text-blue-500 border rounded p-1 drop-shadow hover:text-blue-700 mr-2">
+                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path fill="currentColor" d="M4 9.05H3v2h1v-2Zm16 2h1v-2h-1v2ZM10 14a1 1 0 1 0 0 2v-2Zm4 2a1 1 0 1 0 0-2v2Zm-3 1a1 1 0 1 0 2 0h-2Zm2-4a1 1 0 1 0-2 0h2Zm-2-5.95a1 1 0 1 0 2 0h-2Zm2-3a1 1 0 1 0-2 0h2Zm-7 3a1 1 0 0 0 2 0H6Zm2-3a1 1 0 1 0-2 0h2Zm8 3a1 1 0 1 0 2 0h-2Zm2-3a1 1 0 1 0-2 0h2Zm-13 3h14v-2H5v2Zm14 0v12h2v-12h-2Zm0 12H5v2h14v-2Zm-14 0v-12H3v12h2Zm0 0H3a2 2 0 0 0 2 2v-2Zm14 0v2a2 2 0 0 0 2-2h-2Zm0-12h2a2 2 0 0 0-2-2v2Zm-14-2a2 2 0 0 0-2 2h2v-2Zm-1 6h16v-2H4v2ZM10 16h4v-2h-4v2Zm3 1v-4h-2v4h2Zm0-9.95v-3h-2v3h2Zm-5 0v-3H6v3h2Zm10 0v-3h-2v3h2Z"/>
+                                    </svg>
+                                </a>
+                                <a href="/set_expiration/{{article.id}}/3" class="border rounded p-1 drop-shadow hover:text-blue-700 mr-2 flex flex-row">
+                                    3x<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path fill="currentColor" d="M4 9.05H3v2h1v-2Zm16 2h1v-2h-1v2ZM10 14a1 1 0 1 0 0 2v-2Zm4 2a1 1 0 1 0 0-2v2Zm-3 1a1 1 0 1 0 2 0h-2Zm2-4a1 1 0 1 0-2 0h2Zm-2-5.95a1 1 0 1 0 2 0h-2Zm2-3a1 1 0 1 0-2 0h2Zm-7 3a1 1 0 0 0 2 0H6Zm2-3a1 1 0 1 0-2 0h2Zm8 3a1 1 0 1 0 2 0h-2Zm2-3a1 1 0 1 0-2 0h2Zm-13 3h14v-2H5v2Zm14 0v12h2v-12h-2Zm0 12H5v2h14v-2Zm-14 0v-12H3v12h2Zm0 0H3a2 2 0 0 0 2 2v-2Zm14 0v2a2 2 0 0 0 2-2h-2Zm0-12h2a2 2 0 0 0-2-2v2Zm-14-2a2 2 0 0 0-2 2h2v-2Zm-1 6h16v-2H4v2ZM10 16h4v-2h-4v2Zm3 1v-4h-2v4h2Zm0-9.95v-3h-2v3h2Zm-5 0v-3H6v3h2Zm10 0v-3h-2v3h2Z"/>
+                                    </svg>
+                                </a>
+                                <a href="/set_expiration/{{article.id}}/7" class="text-blue-500 border rounded p-1 drop-shadow hover:text-blue-700 mr-2">
+                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" d="M6 5V4a1 1 0 1 1 2 0v1h3V4a1 1 0 1 1 2 0v1h3V4a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v2H3V7a2 2 0 0 1 2-2h1ZM3 19v-8h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm5-6a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Z" clip-rule="evenodd"/>
+                                    </svg>
+                                </a>
+                                <a href="/remove_article/{{article.id}}" class="text-red-500 hover:text-red-700">
+                                    <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 {% endif %}
@@ -34,4 +58,13 @@
         </tbody>
     </table>
 {% endfor %}</a>
+<hr class="my-4">
+<h2 class="text-2xl font-bold px-4">{{ txt_new_storage }}</h2>
+<form class="mt-8 mx-4 flex flex-row gap-1 " method="POST" action="/create_storage">
+    <div class="flex items-center">
+        <label for="storage_name" class="mr-2 ">{{ txt_storage }}:</label>
+        <input type="text" id="storage_name" name="storage_name" class="px-2 py-1 h-full border border-gray-300 rounded">
+    </div>
+    <button type="submit" class="px-4 py-0 w-24 bg-blue-500 text-white rounded hover:bg-blue-700">{{ txt_create }}</button>
+</form>
 {% endblock %}

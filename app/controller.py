@@ -1,8 +1,11 @@
 from datetime import date
 from typing import Optional
-from app.models import User, Storage, UserStorage, Article, Session, engine, SQLModel
+from app.models import BarCodeCache, User, Storage, UserStorage, Article, Session, engine, SQLModel
 from sqlmodel import select
 import bcrypt
+import openfoodfacts
+
+api = openfoodfacts.API(user_agent="BeforeYouGo/0.1")
 
 def valid_storage(session:Session, storage_id_or_name:int|str, user_id:int)-> Optional[Storage]:
     if isinstance(storage_id_or_name, int):
@@ -137,3 +140,20 @@ def user_login(session:Session, name:str, password:str):
     if bcrypt.checkpw(password.encode("utf-8"), user.password_hash.encode("utf-8")):
         return user
     raise ValueError("Invalid password")
+
+def lookup_data(session:Session, barcode:str):
+    cache = session.exec(select(BarCodeCache).where(BarCodeCache.barcode == barcode)).first()
+    if cache:
+        return cache.data
+    # Call external API
+    try:
+        data = api.product.get(code=barcode,fields=["product_name","quantity","brands"])
+        if data:
+            data_str = f'{data["product_name"]} ({data["brands"]}) - {data["quantity"]}'
+            session.add(BarCodeCache(barcode=barcode, data=data_str))
+            session.commit()
+            return data_str
+    except Exception as e:
+        print(e)
+    return ""
+

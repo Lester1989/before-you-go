@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  before-you-go:
+    image: before-you-go
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    environment:
+      - blah=blah
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --port 8000 --host 0.0.0.0"
+    ports:
+      - 8000:8000
+    volumes:
+      - before-you-go:/database
+
+
+volumes:
+  before-you-go:
