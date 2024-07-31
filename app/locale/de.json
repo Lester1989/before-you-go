@@ -2,6 +2,7 @@
     "txt_actions": "Haltbarkeit Anpassen",
     "txt_article_name": "Artikelname",
     "txt_barcode": "Barcode",
+    "txt_cancel": "Abbrechen",
     "txt_check_in_articles": "Artikel hinzufügen",
     "txt_create": "Erstellen",
     "txt_days_over_due": "Tage überfällig",
@@ -17,6 +18,8 @@
     "txt_new_storage": "Neuer Lagerort",
     "txt_password": "Passwort",
     "txt_sat": "Sa",
+    "txt_set": "Setzen",
+    "txt_set_expiration": "Haltbarkeit setzen",
     "txt_storage": "Lagerort",
     "txt_storage_view": "Vorratsübersicht",
     "txt_submit": "Absenden",
@@ -24,8 +27,5 @@
     "txt_thu": "Do",
     "txt_tue": "Di",
     "txt_wed": "Mi",
-    "txt_welcome": "Wilkkommen",
-    "txt_set": "Setzen",
-    "txt_cancel": "Abbrechen",
-    "txt_set_expiration": "Haltbarkeit setzen"
+    "txt_welcome": "Wilkkommen"
 }
