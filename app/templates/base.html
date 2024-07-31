@@ -80,8 +80,13 @@
           </button>
 
     </header>
-
+ 
     <main class="container mx-auto p-4 ">
+        {% for flash_message in flashed_messages %}
+        <div id="flash-message{{loop.index}}" class="{{ flash_message.color}} p-4 transition delay-1000 duration-1000">
+          {{ flash_message.message|safe }}
+        </div>
+      {% endfor %}
         {% block content %}{% endblock %}
     </main>
 
@@ -89,6 +94,22 @@
         <!-- Your footer content here -->
     </footer>
 
+    <script>
+        
+        {% for flash_message in flashed_messages %}
+        let flashMessage{{loop.index}} = document.getElementById("flash-message{{loop.index}}");
+        flashMessage{{loop.index}}.addEventListener("click", function(){
+           this.remove();
+       });
+       flashMessage{{loop.index}}.addEventListener("transitionend", function(){
+           this.remove();
+       });
+         setTimeout(function(){
+              flashMessage{{loop.index}}.classList.add("opacity-0");
+            }, 3000);
+
+      {% endfor %}
+    </script>
     <script>
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
       if (

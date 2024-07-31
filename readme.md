@@ -4,5 +4,9 @@
 * [x] Tests
 * [ ] Anboarding Tutorial
 * [ ] Configuration je User
-* [ ] Storage anlegen/verwalten
-* [ ] Error handling - forwarding
+* [x] Storage anlegen/verwalten
+  * [ ] Bug: Storage mit gleichem Namen wie gelöschter Storage... -> relations vermutlich nicht entfernt
+* [x] Error handling - forwarding
+* [x] Flash Messages
+  * [ ] mehr Flash Messages
+* [ ] Interactive Tables (JQuery)

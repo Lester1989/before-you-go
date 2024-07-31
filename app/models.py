@@ -38,7 +38,7 @@ class User(SQLModel, table=True):
         return session.exec(select(Storage).join(UserStorage).where(UserStorage.user_id == self.id)).all()
 
     def articles(self, session: Session):
-        return session.exec(select(Article).join(Storage).join(UserStorage).where(UserStorage.user_id == self.id)).all()
+        return session.exec(select(Article).join(Storage).join(UserStorage).where(UserStorage.user_id == self.id).order_by(Article.expiration_date)).all()
 
 
 class UserStorage(SQLModel, table=True):

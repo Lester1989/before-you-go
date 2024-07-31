@@ -1,0 +1,20 @@
+{% if description|trim == '401: Not authenticated' %}
+    {% include 'login.html' %}
+{% else %}
+    {% extends 'base.html' %}
+
+
+    {% block header %}
+        <h3>
+        {% block title %}
+            Fehler
+        {% endblock %}
+        </h3>
+    {% endblock %}
+
+    {% block content %}
+        <pre style="white-space: pre-line; color:red; margin: 10px 0; padding-left: 10px; border-left: 10px solid red;">
+            {{ description|trim }}
+        </pre>
+    {% endblock %}
+{% endif %}

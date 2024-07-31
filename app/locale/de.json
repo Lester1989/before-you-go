@@ -24,5 +24,8 @@
     "txt_thu": "Do",
     "txt_tue": "Di",
     "txt_wed": "Mi",
-    "txt_welcome": "Wilkkommen"
+    "txt_welcome": "Wilkkommen",
+    "txt_set": "Setzen",
+    "txt_cancel": "Abbrechen",
+    "txt_set_expiration": "Haltbarkeit setzen"
 }

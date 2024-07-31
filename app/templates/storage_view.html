@@ -30,7 +30,7 @@
                         {% endif %}
                         <td class="py-2 px-4 border w-1/4">
                             <div class="flex flex-row">
-                                <a href="/set_expiration/{{article.id}}/1" class="text-blue-500 border rounded p-1 drop-shadow hover:text-blue-700 mr-2">
+                                <a href="/set_expiration/{{article.id}}/1" class="border rounded p-1 drop-shadow hover:text-blue-700 mr-2">
                                     <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                         <path fill="currentColor" d="M4 9.05H3v2h1v-2Zm16 2h1v-2h-1v2ZM10 14a1 1 0 1 0 0 2v-2Zm4 2a1 1 0 1 0 0-2v2Zm-3 1a1 1 0 1 0 2 0h-2Zm2-4a1 1 0 1 0-2 0h2Zm-2-5.95a1 1 0 1 0 2 0h-2Zm2-3a1 1 0 1 0-2 0h2Zm-7 3a1 1 0 0 0 2 0H6Zm2-3a1 1 0 1 0-2 0h2Zm8 3a1 1 0 1 0 2 0h-2Zm2-3a1 1 0 1 0-2 0h2Zm-13 3h14v-2H5v2Zm14 0v12h2v-12h-2Zm0 12H5v2h14v-2Zm-14 0v-12H3v12h2Zm0 0H3a2 2 0 0 0 2 2v-2Zm14 0v2a2 2 0 0 0 2-2h-2Zm0-12h2a2 2 0 0 0-2-2v2Zm-14-2a2 2 0 0 0-2 2h2v-2Zm-1 6h16v-2H4v2ZM10 16h4v-2h-4v2Zm3 1v-4h-2v4h2Zm0-9.95v-3h-2v3h2Zm-5 0v-3H6v3h2Zm10 0v-3h-2v3h2Z"/>
                                     </svg>
@@ -40,11 +40,12 @@
                                         <path fill="currentColor" d="M4 9.05H3v2h1v-2Zm16 2h1v-2h-1v2ZM10 14a1 1 0 1 0 0 2v-2Zm4 2a1 1 0 1 0 0-2v2Zm-3 1a1 1 0 1 0 2 0h-2Zm2-4a1 1 0 1 0-2 0h2Zm-2-5.95a1 1 0 1 0 2 0h-2Zm2-3a1 1 0 1 0-2 0h2Zm-7 3a1 1 0 0 0 2 0H6Zm2-3a1 1 0 1 0-2 0h2Zm8 3a1 1 0 1 0 2 0h-2Zm2-3a1 1 0 1 0-2 0h2Zm-13 3h14v-2H5v2Zm14 0v12h2v-12h-2Zm0 12H5v2h14v-2Zm-14 0v-12H3v12h2Zm0 0H3a2 2 0 0 0 2 2v-2Zm14 0v2a2 2 0 0 0 2-2h-2Zm0-12h2a2 2 0 0 0-2-2v2Zm-14-2a2 2 0 0 0-2 2h2v-2Zm-1 6h16v-2H4v2ZM10 16h4v-2h-4v2Zm3 1v-4h-2v4h2Zm0-9.95v-3h-2v3h2Zm-5 0v-3H6v3h2Zm10 0v-3h-2v3h2Z"/>
                                     </svg>
                                 </a>
-                                <a href="/set_expiration/{{article.id}}/7" class="text-blue-500 border rounded p-1 drop-shadow hover:text-blue-700 mr-2">
+                                <a href="/set_expiration/{{article.id}}/7" class="border rounded p-1 drop-shadow hover:text-blue-700 mr-2">
                                     <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                         <path fill-rule="evenodd" d="M6 5V4a1 1 0 1 1 2 0v1h3V4a1 1 0 1 1 2 0v1h3V4a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v2H3V7a2 2 0 0 1 2-2h1ZM3 19v-8h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm5-6a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Z" clip-rule="evenodd"/>
                                     </svg>
                                 </a>
+                                <button type="button" class="border rounded p-1 drop-shadow hover:text-blue-700 mr-2" onclick="getElementById('expiration_dialog').showModal();getElementById('dialog_article_id').value='{{article.id}}';getElementById('dialog_article_name').innerText='{{article.name}}';">...</button>
                                 <a href="/remove_article/{{article.id}}" class="text-red-500 hover:text-red-700">
                                     <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -63,8 +64,49 @@
 <form class="mt-8 mx-4 flex flex-row gap-1 " method="POST" action="/create_storage">
     <div class="flex items-center">
         <label for="storage_name" class="mr-2 ">{{ txt_storage }}:</label>
-        <input type="text" id="storage_name" name="storage_name" class="px-2 py-1 h-full border border-gray-300 rounded">
+        <input type="text" id="storage_name" name="storage_name" class="px-2 py-1 h-full border border-gray-300 rounded text-black">
     </div>
     <button type="submit" class="px-4 py-0 w-24 bg-blue-500 text-white rounded hover:bg-blue-700">{{ txt_create }}</button>
 </form>
+<dialog id="expiration_dialog" class="bg-white dark:bg-gray-800 shadow dark:shadow-white p-4 rounded backdrop:bg-black/50 backdrop:backdrop-blur-md">
+    <h2 class="text-xl font-bold dark:text-white">{{ txt_set_expiration }}</h2>
+    <h3 id="dialog_article_name" class="text-lg font-bold dark:text-white"></h3>
+    <div class="flex flex-col gap-2 mb-4">
+
+        <input type="hidden" id="dialog_article_id" name="article_id" value="">
+    <label for="days" class="dark:text-white">{{ txt_days_remaining }} <output id="dialog_days_label">14</output></label>
+    <input type="range" id="days" name="days" value="14" min="1" max="100" step="1">
+    <label for="days" class="dark:text-white">{{ txt_enter_expiration_date }}</label>
+    <input type="date" id="expiration_date" name="expiration_date" value="">
+    </div>
+    <div class="flex flex-row gap-2">
+        <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700" onclick="window.location.href='/set_expiration/'+document.getElementById('dialog_article_id').value+'/'+document.getElementById('days').value;">{{ txt_set }}</button>
+        <button type="button" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700" onclick="document.getElementById('expiration_dialog').close();">{{ txt_cancel }}</button>
+    </div>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('expiration_dialog').addEventListener('close', function() {
+        document.getElementById('days').value = '';
+        document.getElementById('expiration_date').value = '';
+    });
+
+    document.getElementById('days').addEventListener('input', function() {
+        let days = document.getElementById('days').value;
+        document.getElementById('dialog_days_label').value = days;
+        let date = new Date();
+        date.setDate(date.getDate() + parseInt(days));
+        document.getElementById('expiration_date').value = date.toISOString().split('T')[0];
+    });
+
+    document.getElementById('expiration_date').addEventListener('input', function() {
+        let expiration_date = new Date(document.getElementById('expiration_date').value);
+        let today = new Date();
+        let days = int((expiration_date - today) / (1000 * 60 * 60 * 24));
+        document.getElementById('days').value = days;
+        document.getElementById('dialog_days_label').value = days;
+    });
+</script>
 {% endblock %}

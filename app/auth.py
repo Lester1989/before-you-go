@@ -122,9 +122,7 @@ def create_access_token(data: dict) -> str:
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode["exp"] = expire
-    print("created token", to_encode)
     result = jwt.encode(to_encode, JWT_KEY, algorithm=ALGORITHM)
-    print("result", result)
     return result
 
 
@@ -140,9 +138,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme),db:Session=Depend
     try:
         if token.startswith("Bearer "):
             token = token.split("Bearer ")[1]
-        print("token", token)
         payload = jwt.decode(token, JWT_KEY, algorithms=[ALGORITHM])
-        print("payload", payload)
         name: str = payload.get("sub")  # type: ignore
         if name is None:
             raise NotAuthenticatedException

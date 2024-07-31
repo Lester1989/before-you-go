@@ -4,15 +4,15 @@
         <h1 class="text-2xl font-bold mb-4">{{ txt_check_in_articles }}</h1>
         <form action="/checkin" method="POST">
             <div class="mb-4">
-                <label for="barcode" class="block text-gray-700">{{ txt_barcode }}:</label>
+                <label for="barcode" class="block text-gray-700 dark:text-gray-100">{{ txt_barcode }}:</label>
                 <input type="text" id="barcode" name="barcode" class="border border-gray-300 rounded px-4 py-2 w-full" autofocus>
             </div>
             <div class="mb-4">
-                <label for="name" class="block text-gray-700">{{ txt_article_name }}:</label>
+                <label for="name" class="block text-gray-700 dark:text-gray-100">{{ txt_article_name }}:</label>
                 <input type="text" id="name" name="name" class="border border-gray-300 rounded px-4 py-2 w-full">
             </div>
             <div class="mb-4">
-                <label for="storage_id" class="block text-gray-700">{{ txt_storage }}:</label>
+                <label for="storage_id" class="block text-gray-700 dark:text-gray-100">{{ txt_storage }}:</label>
                 <select id="storage_id" name="storage_id" class="border border-gray-300 rounded px-4 py-2 w-full">
                     {% for storage in storages %}
                         <option value="{{ storage.id }}" {% if selected_storage_id == storage.id %} selected {% endif %}>{{ storage.name }}</option>
@@ -27,9 +27,9 @@
         <table class="mt-4 mt-4 mx-4 border-collapse">
             <thead>
                 <tr>
-                    <th class="py-2 px-4 bg-gray-200 w-1/2">{{ txt_name }}</th>
-                    <th class="py-2 px-4 bg-gray-200 w-1/4">{{ txt_storage }}</th>
-                    <th class="py-2 px-4 bg-gray-200 w-1/4">{{ txt_expiration_date }}</th>
+                    <th class="py-2 px-4 border bg-gray-200 dark:text-black w-1/2">{{ txt_name }}</th>
+                    <th class="py-2 px-4 border bg-gray-200 dark:text-black w-1/4">{{ txt_storage }}</th>
+                    <th class="py-2 px-4 border bg-gray-200 dark:text-black w-1/4">{{ txt_expiration_date }}</th>
                 </tr>
             </thead>
             <tbody>
