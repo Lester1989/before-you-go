@@ -88,6 +88,13 @@
 
 {% block scripts %}
 <script>
+    {% for storage in storages %}
+    new DataTable('#{{string_to_slug(storage.name)}}', {
+    order: [[1, 'asc']]
+    });
+    {% endfor %}
+</script>
+<script>
     document.getElementById('expiration_dialog').addEventListener('close', function() {
         document.getElementById('days').value = '';
         document.getElementById('expiration_date').value = '';

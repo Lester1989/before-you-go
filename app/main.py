@@ -77,7 +77,7 @@ def get_translations(request: Request) -> dict[str, str]:
 
 
 @app.get("/seed")
-async def seed_view(db: Session = Depends(get_db)):
+async def seed_view(request: Request,db: Session = Depends(get_db)):
     user = user_create(db, "admin", "admin")
     fridge = storage_create(db, user.id, "Fridge")
     freezer = storage_create(db, user.id, "Freezer")
@@ -85,6 +85,7 @@ async def seed_view(db: Session = Depends(get_db)):
     article_create(
         db, user.id, "Ice Cream", freezer.id, date.today() + timedelta(days=300)
     )
+    flash(request,"Seeded database", "success")
     return RedirectResponse(url="/login")
 
 
@@ -100,16 +101,20 @@ async def login_view_post(
     password: str = Form(...),
     db: Session = Depends(get_db),
 ):
-    user = user_login(db, name, password)
-    if user:
-        result = RedirectResponse(url="/storage", status_code=status.HTTP_303_SEE_OTHER)
-        result.set_cookie(
-            key="access_token",
-            value=f'Bearer {create_access_token({"sub": user.name})}',
-        )
-        flash(request,"Login","success")
-        return result
-    return RedirectResponse(url="/login")
+    try:
+        user = user_login(db, name, password)
+        if user:
+            result = RedirectResponse(url="/storage", status_code=status.HTTP_303_SEE_OTHER)
+            result.set_cookie(
+                key="access_token",
+                value=f'Bearer {create_access_token({"sub": user.name})}',
+            )
+            flash(request,"Login success","success")
+            return result
+    except ValueError:
+        flash(request,"Wrong Username or Password","danger")
+
+    return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
 
 
 
@@ -121,7 +126,6 @@ async def storage_view(
 ):
     storages = user.storages(db)
     articles = user.articles(db)
-    flash(request,"Storage","info")
     return templates.TemplateResponse(
         request,
         "storage_view.html",
@@ -189,22 +193,9 @@ async def checkin_date_view(
     db: Session = Depends(get_db),
 ):
     storage = valid_storage(db, storage_id, user.id)
-    print("valid storage", storage)
     storages = user.storages(db)
 
-    first_of_month = date.today().replace(day=1)
-    first_of_next_month = first_of_month + timedelta(
-        days=calendar.monthrange(first_of_month.year, first_of_month.month)[1]
-    )
-    last_of_next_month = first_of_next_month + timedelta(
-        days=calendar.monthrange(first_of_next_month.year, first_of_next_month.month)[1]
-        - 1
-    )
-
-    days = {}
-    for i in range((last_of_next_month - first_of_month).days + 1):
-        day = first_of_month + timedelta(days=i)
-        days[day] = (day.month, day.weekday(), (day - date.today()).days)
+    first_of_month, first_of_next_month, days = calculate_calendar_dates()
 
     result = templates.TemplateResponse(
         request,
@@ -226,6 +217,17 @@ async def checkin_date_view(
     )
     return result
 
+def calculate_calendar_dates():
+    first_of_month = date.today().replace(day=1)
+    first_of_next_month = first_of_month + timedelta( days=calendar.monthrange(first_of_month.year, first_of_month.month)[1] )
+    last_of_next_month = first_of_next_month + timedelta( days=calendar.monthrange(first_of_next_month.year, first_of_next_month.month)[1] - 1 )
+
+    days = {}
+    for i in range((last_of_next_month - first_of_month).days + 1):
+        day = first_of_month + timedelta(days=i)
+        days[day] = (day.month, day.weekday(), (day - date.today()).days)
+    return first_of_month,first_of_next_month,days
+
 
 @app.post("/checkin_date")
 async def checkin_date_view_post(
@@ -237,9 +239,12 @@ async def checkin_date_view_post(
     db: Session = Depends(get_db),
 ):
     storage = valid_storage(db, storage_id, user.id)
-    print("valid storage", storage)
     new_article = article_create(db, user.id, name, storage.id, expiration_date)
-    print(new_article)
+    flash(
+        request,
+        f"Article added: {new_article.name} in {storage.name} with expiration date {new_article.expiration_date}",
+        "success"
+    )
     result = RedirectResponse(
         url=f"/checkin?storage_id={storage_id}", status_code=status.HTTP_303_SEE_OTHER
     )
@@ -261,6 +266,7 @@ async def set_expiration_view(
     if article:
         article.expiration_date = date.today() + timedelta(days=remaining_days)
         db.commit()
+        flash(request,f"Expiration date updated to {article.expiration_date.strftime('%Y-%m-%d')}","success")
     result = RedirectResponse(url="/storage")
     result.set_cookie(
         key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
@@ -278,6 +284,9 @@ async def remove_article_view(
     article = valid_article(db, article_id, user.id)
     if article:
         article_delete(db, user.id, article_id)
+        flash(request,f"Article {article.name} removed","success")
+    else:
+        flash(request,"Article not found","danger")
     result = RedirectResponse(url="/storage")
     result.set_cookie(
         key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
@@ -296,8 +305,12 @@ async def remove_storage_view(
     if storage:
         articles = article_list(db, user.id, storage_id)
         if articles:
-            return RedirectResponse(url="/storage")
-        storage_delete(db, user.id, storage_id)
+            flash(request,"Storage not empty","danger")
+        else:
+            storage_delete(db, user.id, storage_id)
+            flash(request,f"Storage {storage.name} removed","success")
+    else:
+        flash(request,"Storage not found","danger")
     result = RedirectResponse(url="/storage")
     result.set_cookie(
         key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
@@ -313,11 +326,17 @@ async def create_storage_view(
     db: Session = Depends(get_db),
 ):
     storage_create(db, user.id, storage_name)
-    return RedirectResponse(url="/storage", status_code=status.HTTP_303_SEE_OTHER)
+    flash(request,f"Storage {storage_name} created","success")
+    result = RedirectResponse(url="/storage",status_code=status.HTTP_303_SEE_OTHER)
+    result.set_cookie(
+        key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
+    )
+    return result
 
 
 @app.get("/logout")
 async def logout_view(request: Request):
+    flash(request,"Logged out","success")
     result = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     result.delete_cookie("access_token")
     return result
@@ -329,5 +348,8 @@ def page_not_found(request:Request, description:HTTPException):
     print('trigger exception handler',type(description),description)
     if description.detail.endswith('Not authenticated'):
         flash(request,"Not authenticated","danger")
+        result = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        result.delete_cookie("access_token")
+        return result
     return templates.TemplateResponse(request,"error.html", { 'description':description}|get_translations(request)|get_flashed_messages(request),status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

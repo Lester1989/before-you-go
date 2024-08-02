@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 from app.models import BarCodeCache, User, Storage, UserStorage, Article, Session, engine, SQLModel
-from sqlmodel import select
+from sqlmodel import select,delete
 import bcrypt
 import openfoodfacts
 
@@ -87,8 +87,10 @@ def storage_delete(session:Session, user_id:int, storage_id:int):
     storage = valid_storage(session, storage_id, user_id)
     if not storage:
         raise ValueError("Invalid storage")
+    session.exec(delete(UserStorage).where(UserStorage.storage_id == storage.id))
     session.delete(storage)
     session.commit()
+    print("Deleted",storage)
     return storage
 
 def storage_update(session:Session, user_id:int, storage_id:int, name:str):
