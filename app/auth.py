@@ -148,6 +148,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme),db:Session=Depend
     user = get_user(name,db)  # type: ignore
     if user is None:
         raise NotAuthenticatedException
+    if not user.is_activated:
+        raise ValueError("User not activated")
     return user
 
 

@@ -1,8 +1,4 @@
-# create the fastapi app in main.py. the app is a webapp showing the pages from the templates folder using jinja2 templating
-
 import calendar
-import json
-import pathlib
 import random
 import string
 import urllib.parse
@@ -11,7 +7,6 @@ from typing import Optional
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.auth import app as auth_app
@@ -29,7 +24,8 @@ from app.controller import (
     valid_storage,
 )
 from app.models import Session, SQLModel, User, engine
-from app.utility import get_db, get_flashed_messages, flash
+from app.utility import get_db, get_flashed_messages, flash, get_translations, templates
+from app.route_user import app as user_app
 
 SQLModel.metadata.create_all(engine)
 
@@ -39,41 +35,9 @@ app.add_middleware(
     SessionMiddleware,
     secret_key="".join([random.choice(string.ascii_letters) for _ in range(32)]),
 )
-
-templates = Jinja2Templates(directory="app/templates")
-
+app.include_router(user_app)
 app.include_router(auth_app)
 
-
-def string_to_slug(raw_string: str):
-    result = "".join(
-        [
-            char if char in string.ascii_lowercase + string.digits else "-"
-            for char in raw_string.lower()
-        ]
-    )
-    return result.replace("--", "-")
-
-
-templates.env.globals["string_to_slug"] = string_to_slug
-templates.env.globals["get_flashed_messages"] = get_flashed_messages
-
-
-locales: dict[str, dict[str, str]] = {
-    file_name.stem.lower(): json.loads(file_name.read_text(encoding="utf-8"))
-    for file_name in pathlib.Path("app/", "locale").iterdir()
-}
-
-
-def get_translations(request: Request) -> dict[str, str]:
-    requested_languages: list[str] = request.headers.get("Accept-Language", "en").split(
-        ","
-    )
-    for language in requested_languages:
-        clean_language = language.split("-")[0].lower()
-        if clean_language in locales:
-            return locales[clean_language]
-    return locales["en"]
 
 
 @app.get("/seed")
@@ -87,34 +51,6 @@ async def seed_view(request: Request,db: Session = Depends(get_db)):
     )
     flash(request,"Seeded database", "success")
     return RedirectResponse(url="/login")
-
-
-@app.get("/login")
-async def login_view(request: Request):
-    return templates.TemplateResponse(request, "login.html", get_translations(request) | get_flashed_messages(request))
-
-
-@app.post("/login")
-async def login_view_post(
-    request: Request,
-    name: str = Form(...),
-    password: str = Form(...),
-    db: Session = Depends(get_db),
-):
-    try:
-        user = user_login(db, name, password)
-        if user:
-            result = RedirectResponse(url="/storage", status_code=status.HTTP_303_SEE_OTHER)
-            result.set_cookie(
-                key="access_token",
-                value=f'Bearer {create_access_token({"sub": user.name})}',
-            )
-            flash(request,"Login success","success")
-            return result
-    except ValueError:
-        flash(request,"Wrong Username or Password","danger")
-
-    return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
 
 
 
@@ -333,13 +269,6 @@ async def create_storage_view(
     )
     return result
 
-
-@app.get("/logout")
-async def logout_view(request: Request):
-    flash(request,"Logged out","success")
-    result = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
-    result.delete_cookie("access_token")
-    return result
 
 
 

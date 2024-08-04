@@ -1,11 +1,21 @@
 from datetime import date
 from typing import Optional
-from app.models import BarCodeCache, User, Storage, UserStorage, Article, Session, engine, SQLModel
+from app.mail_sending import send_registration_mail
+from app.models import BarCodeCache, User, Storage, UserStorage, Article, Session, UserRegistration
 from sqlmodel import select,delete
 import bcrypt
 import openfoodfacts
+import re
+
 
 api = openfoodfacts.API(user_agent="BeforeYouGo/0.1")
+
+def validate_new_user_name(session:Session,name:str):
+    if not re.match("^[A-Za-z0-9_-]*$", name):
+        raise ValueError("Only letters, numbers, - and _ are allowed")
+    existing_user = session.exec(select(User).where(User.name == name)).first()
+    if existing_user:
+        raise ValueError("User with that name already exists")
 
 def valid_storage(session:Session, storage_id_or_name:int|str, user_id:int)-> Optional[Storage]:
     if isinstance(storage_id_or_name, int):
@@ -102,16 +112,23 @@ def storage_update(session:Session, user_id:int, storage_id:int, name:str):
     session.refresh(storage)
     return storage
 
-def user_create(session:Session, name:str, password:str, email:str=None):
+def user_create(session:Session, name:str, password:str, email:str, with_registration:bool=False):
+    validate_new_user_name(session, name)
     password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
     user = User(name=name, password_hash=password_hash, email=email)
     session.add(user)
     session.commit()
     session.refresh(user)
+    if with_registration:
+        token = bcrypt.hashpw(name.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        session.add(UserRegistration(token=token, user_id=user.id))
+        session.commit()
+        send_registration_mail(user.email, token)
+        return user
     return user
 
 def user_list(session:Session):
-    return session.exec(select(User)).all()
+    return session.exec(select(User).where(User.is_activated)).all()
 
 def user_delete(session:Session, user_id:int):
     user = session.exec(select(User).where(User.id == user_id)).first()
@@ -135,10 +152,30 @@ def user_update(session:Session, user_id:int, name:str=None, password:str=None, 
     session.refresh(user)
     return user
 
+def user_activate(session:Session, token:str):
+    user_registration = session.exec(select(UserRegistration).where(UserRegistration.token == token)).first()
+    if not user_registration:
+        raise ValueError("Invalid token")
+    user = session.exec(select(User).where(User.id == user_registration.user_id)).first()
+    session.delete(user_registration)
+    if not user:
+        session.commit()
+        raise ValueError("Invalid user")
+    user.is_activated = True
+    session.commit()
+    session.refresh(user)
+    return user
+
 def user_login(session:Session, name:str, password:str):
     user = session.exec(select(User).where(User.name == name)).first()
     if not user:
         raise ValueError("Invalid user")
+    if not user.is_activated:
+        registration = session.exec(select(UserRegistration).where(UserRegistration.user_id == user.id)).first()
+        if not registration:
+            registration = UserRegistration(token=bcrypt.hashpw(name.encode("utf-8"), bcrypt.gensalt()).decode("utf-8"), user_id=user.id)
+        send_registration_mail(user.email, registration.token)
+        raise ValueError("User not activated yet, please check your email")
     if bcrypt.checkpw(password.encode("utf-8"), user.password_hash.encode("utf-8")):
         return user
     raise ValueError("Invalid password")
@@ -155,7 +192,6 @@ def lookup_data(session:Session, barcode:str):
             session.add(BarCodeCache(barcode=barcode, data=data_str))
             session.commit()
             return data_str
-    except Exception as e:
+    except ValueError as e:
         print(e)
     return ""
-

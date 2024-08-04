@@ -32,7 +32,8 @@ class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(default=None, index=True)
     password_hash: str
-    email: Optional[str] = None
+    email: str
+    is_activated: bool = False
 
     def storages(self, session: Session):
         return session.exec(select(Storage).join(UserStorage).where(UserStorage.user_id == self.id)).all()
@@ -40,6 +41,10 @@ class User(SQLModel, table=True):
     def articles(self, session: Session):
         return session.exec(select(Article).join(Storage).join(UserStorage).where(UserStorage.user_id == self.id).order_by(Article.expiration_date)).all()
 
+class UserRegistration(SQLModel, table=True):
+    token: str = Field(primary_key=True)
+    user_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    registration_date: datetime = Field(default_factory=datetime.today)
 
 class UserStorage(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

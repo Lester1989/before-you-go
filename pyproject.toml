@@ -22,6 +22,7 @@ pytest-cov = "^5.0.0"
 alembic = "^1.13.2"
 starlette-session-middleware = "^0.1.1"
 itsdangerous = "^2.2.0"
+resend = "^2.3.0"
 
 
 [build-system]

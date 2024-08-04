@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center">
+    <form class="w-64" method="post" action="/register">
+        <div class="mb-4">
+            <label for="name" class="block text-gray-700 dark:text-gray-100 text-sm font-bold mb-2">{{ txt_name }}:</label>
+            <input required type="text" id="name" name="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+            <label for="password" class="block text-gray-700 dark:text-gray-100 text-sm font-bold mb-2">{{ txt_password }}:</label>
+            <input required type="password" id="password" name="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+            <label for="password_confirm" class="block text-gray-700 dark:text-gray-100 text-sm font-bold mb-2">{{ txt_password_confirm }}:</label>
+            <input required type="password" id="password_confirm" name="password_confirm" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+            <label for="email" class="block text-gray-700 dark:text-gray-100 text-sm font-bold mb-2">{{ txt_email }}:</label>
+            <input required type="email" id="email" name="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="flex items-center justify-between">
+            <button type="submit" disabled id="submit-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">{{ txt_login }}</button>
+            <label id="submit-button-warning" class="text-gray-700 dark:text-gray-100 text-sm font-bold mb-2 border border-red-500 rounded px-2 py-1" style="display: none;">
+                {{ txt_warn_passwords_not_matching }}
+            </label>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function checkPassword() {
+            var password = document.getElementById('password').value;
+            var passwordConfirm = document.getElementById('password_confirm').value;
+            var submitButton = document.getElementById('submit-button');
+            var submitButtonWarning = document.getElementById('submit-button-warning');
+            
+            if (password === passwordConfirm) {
+                submitButton.disabled = false;
+                submitButtonWarning.style.display = 'none';
+            } else {
+                submitButton.disabled = true;
+                submitButtonWarning.style.display = 'block';
+            }
+        }
+
+        document.getElementById('password').addEventListener('input', checkPassword);
+        document.getElementById('password_confirm').addEventListener('input', checkPassword);
+    </script>
+{% endblock %}
