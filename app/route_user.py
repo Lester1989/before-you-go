@@ -1,13 +1,13 @@
+import os
 from fastapi import APIRouter, Request, Form, Depends, status
 from fastapi.responses import RedirectResponse
 
+from app.controller_user import user_activate, user_create, user_login, user_update
 from app.models import Session, User
-from app.controller import user_activate, user_create, user_login, user_update
-from app.auth import create_access_token
 from app.utility import get_db, flash, get_flashed_messages, get_translations, templates
+from app.auth import create_access_token, get_current_user
 
 app = APIRouter()
-from app.auth import create_access_token, get_current_user
 
 
 @app.get("/logout")
@@ -30,8 +30,7 @@ async def login_view_post(
     db: Session = Depends(get_db),
 ):
     try:
-        user = user_login(db, name, password)
-        if user:
+        if user := user_login(db, name, password):
             result = RedirectResponse(url="/storage", status_code=status.HTTP_303_SEE_OTHER)
             result.set_cookie(
                 key="access_token",
@@ -39,13 +38,16 @@ async def login_view_post(
             )
             flash(request,"Login success","success")
             return result
-    except ValueError:
-        flash(request,"Wrong Username or Password","danger")
+    except ValueError as e:
+        flash(request,f"Wrong Username or Password {e}","danger")
 
     return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.get("/register")
 async def register_view(request: Request):
+    if not os.environ.get("enable_signup"):
+        flash(request,"Signup disabled","danger")
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     return templates.TemplateResponse(request, "register.html", get_translations(request) | get_flashed_messages(request))
 
 @app.post("/register")
@@ -56,6 +58,9 @@ async def register_view_post(
     email: str = Form(...),
     db: Session = Depends(get_db),
 ):
+    if not os.environ.get("enable_signup"):
+        flash(request,"Signup disabled","danger")
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     try:
         user_create(db, name, password, email, with_registration=True)
         flash(request,"User created, check you mail before you can log in","success")

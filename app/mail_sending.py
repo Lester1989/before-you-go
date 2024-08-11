@@ -1,8 +1,12 @@
 import resend
-import os 
-resend.api_key = os.environ.get('RESEND_API_KEY')
+import os
+has_api_key = os.environ.get('RESEND_API_KEY') is not None
+if has_api_key:
+    resend.api_key = os.environ.get('RESEND_API_KEY')
 
 def send_test_email(to_mail:str):
+    if not has_api_key:
+        return False
     return resend.Emails.send({
         "from": os.environ.get('RESEND_DOMAIN'),
         "to": to_mail,
@@ -12,6 +16,8 @@ def send_test_email(to_mail:str):
     })
 
 def send_registration_mail(to_mail:str,token:str):
+    if not has_api_key:
+        return False
     print(f'start sending registration mail to {to_mail}')
     send_result = resend.Emails.send({
         "from": os.environ.get('RESEND_DOMAIN'),
@@ -24,6 +30,8 @@ def send_registration_mail(to_mail:str,token:str):
     return send_result
 
 def send_password_reset_mail(to_mail:str,user_id:str,reset_id:str):
+    if not has_api_key:
+        return False
     print(f'start sending reset mail to {to_mail}')
     send_result = resend.Emails.send({
         "from": os.environ.get('RESEND_DOMAIN'),
