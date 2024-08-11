@@ -7,6 +7,7 @@
     "txt_create": "Erstellen",
     "txt_days_over_due": "Tage überfällig",
     "txt_days_remaining": "Tage verbleibend",
+    "txt_email": "Email",
     "txt_enter_expiration_date": "Haltbarkeitsdatum eingeben",
     "txt_existing_articles": "Vorhandene Artikel",
     "txt_expiration_date": "MINDEST-Haltbarkeitsdatum",
@@ -17,6 +18,7 @@
     "txt_name": "Name",
     "txt_new_storage": "Neuer Lagerort",
     "txt_password": "Passwort",
+    "txt_password_confirm": "Passwort bestätigen",
     "txt_sat": "Sa",
     "txt_set": "Setzen",
     "txt_set_expiration": "Haltbarkeit setzen",
@@ -26,6 +28,7 @@
     "txt_sun": "So",
     "txt_thu": "Do",
     "txt_tue": "Di",
+    "txt_warn_passwords_not_matching": "Passwörter stimmen nicht überein",
     "txt_wed": "Mi",
     "txt_welcome": "Wilkkommen"
 }
