@@ -4,6 +4,7 @@ import os
 from datetime import date, timedelta
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Request, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import RedirectResponse
 from sqlmodel import Session, select
 from starlette.middleware.sessions import SessionMiddleware
@@ -137,6 +138,16 @@ async def create_storage_view(
     )
     return result
 
+@app.exception_handler(RequestValidationError)
+def request_error(request: Request, description: HTTPException):
+    return templates.TemplateResponse(
+        request,
+        "error.html",
+        {"description": description}
+        | get_translations(request)
+        | get_flashed_messages(request),
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    )
 
 @app.exception_handler(HTTPException)
 def page_not_found(request: Request, description: HTTPException):

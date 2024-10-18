@@ -10,3 +10,7 @@
 * [x] Flash Messages
   * [x] mehr Flash Messages
 * [x] Interactive Tables (JQuery DataTables)
+* [x] User-Self-Management
+  * [x] Registration
+  * [ ] Password Reset
+  * [x] Disable Registration and use environment variables for one user only

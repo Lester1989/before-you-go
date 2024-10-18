@@ -1,5 +1,5 @@
 {
-    ".": 0.6836,
+    ".": 0.684,
     "..__init__.py": 1.0,
     "..auth.py": 0.7522,
     "..controller.py": 0.4375,
@@ -7,7 +7,7 @@
     "..controller_storage.py": 0.7097,
     "..controller_user.py": 0.4118,
     "..mail_sending.py": 0.3043,
-    "..main.py": 0.8442,
+    "..main.py": 0.8395,
     "..models.py": 0.6338,
     "..route_checkin.py": 0.9434,
     "..route_user.py": 0.5818,

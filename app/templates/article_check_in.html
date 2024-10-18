@@ -5,15 +5,15 @@
         <form action="/checkin" method="POST">
             <div class="mb-4">
                 <label for="barcode" class="block text-gray-700 dark:text-gray-100">{{ txt_barcode }}:</label>
-                <input type="text" id="barcode" name="barcode" class="border border-gray-300 rounded px-4 py-2 w-full" autofocus>
+                <input type="text" id="barcode" name="barcode" class="border border-gray-300 rounded px-4 py-2 w-full dark:text-black" autofocus>
             </div>
             <div class="mb-4">
                 <label for="name" class="block text-gray-700 dark:text-gray-100">{{ txt_article_name }}:</label>
-                <input type="text" id="name" name="name" class="border border-gray-300 rounded px-4 py-2 w-full">
+                <input type="text" id="name" name="name" class="border border-gray-300 rounded px-4 py-2 w-full dark:text-black">
             </div>
             <div class="mb-4">
                 <label for="storage_id" class="block text-gray-700 dark:text-gray-100">{{ txt_storage }}:</label>
-                <select id="storage_id" name="storage_id" class="border border-gray-300 rounded px-4 py-2 w-full">
+                <select id="storage_id" name="storage_id" class="border border-gray-300 rounded px-4 py-2 w-full dark:text-black">
                     {% for storage in storages %}
                         <option value="{{ storage.id }}" {% if selected_storage_id == storage.id %} selected {% endif %}>{{ storage.name }}</option>
                     {% endfor %}

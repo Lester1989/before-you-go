@@ -19,7 +19,7 @@ async def logout_view(request: Request):
 
 @app.get("/login")
 async def login_view(request: Request,username:str=None):
-    return templates.TemplateResponse(request, "login.html",{"username":username}| get_translations(request) | get_flashed_messages(request))
+    return templates.TemplateResponse(request, "login.html",{"username":username or ""}| get_translations(request) | get_flashed_messages(request))
 
 
 @app.post("/login")
