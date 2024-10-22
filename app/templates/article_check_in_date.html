@@ -37,7 +37,7 @@
                     {% endfor %}
                     {% for day,day_data in days.items() %}
                         {% if day_data[0] == first_of_month.month %}
-                            <td class="{% if day_data[2]<0 %}text-red-500{% else %} border border-gray-300 rounded-sm{% endif %}">
+                            <td class="{% if day_data[2]<0 %}text-red-500{% else %} border border-gray-300 rounded-md mx-1 my-px{% endif %}">
                                 <button type="button" onclick="getElementById('expiration_date').value='{{day.strftime("%Y-%m-%d")}}';getElementById('date_form').submit();" {% if day_data[2]<0 %}disabled{% endif %}>
                                     {{ day.strftime("%d.%m.") }} ({{ day_data[2] }})
                                 </button>
@@ -70,7 +70,7 @@
                     {% endfor %}
                     {% for day,day_data in days.items() %}
                         {% if day_data[0] == first_of_next_month.month %}
-                            <td>
+                            <td class=" border border-gray-300 rounded-md mx-1 my-px">
                                 <button type="button" onclick="getElementById('expiration_date').value='{{day.strftime("%Y-%m-%d")}}';getElementById('date_form').submit();" >
                                 {{ day.strftime("%d.%m.") }} ({{ day_data[2] }})
                                 </button>

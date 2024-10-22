@@ -1,5 +1,5 @@
 # The builder image, used to build the virtual environment
-FROM python:3.11-buster as builder
+FROM python:3.11-buster AS builder
 
 
 RUN pip install poetry
@@ -17,7 +17,7 @@ RUN touch readme.md
 RUN poetry install --no-root && rm -rf $POETRY_CACHE_DIR
 
 # The runtime image, used to just run the code provided its virtual environment
-FROM python:3.11-slim-buster as runtime
+FROM python:3.11-slim-buster AS runtime
 RUN apt-get update && apt-get install libpq5 -y
 
 ENV VIRTUAL_ENV=/app/.venv \
