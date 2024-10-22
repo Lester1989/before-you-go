@@ -16,10 +16,11 @@ def lookup_data(session: Session, barcode: str):
         if data := api.product.get(
             code=barcode, fields=["product_name", "quantity", "brands"]
         ):
-            data_str = f'{data["product_name"]} ({data["brands"]}) - {data["quantity"]}'
+            data_str = f'{data.get("product_name","-")} ({data.get("brands","-")}) - {data.get("quantity","-")}'
             session.add(BarCodeCache(barcode=barcode, data=data_str))
             session.commit()
             return data_str
     except ValueError as e:
         print(e)
     return ""
+

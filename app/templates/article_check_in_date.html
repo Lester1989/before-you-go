@@ -3,21 +3,21 @@
 {% block content %}
     <form class="max-w-md mx-auto" method="post" action="/checkin_date" id="date_form">
         <label for="name" class="block mb-2">{{ txt_article_name }}:</label>
-        <input type="text" id="name" name="name" value="{{ name }}" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4" />
+        <input type="text" id="name" name="name" value="{{ name }}" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 dark:text-black" />
 
         <label for="storage_id" class="block mb-2">{{ txt_storage}}:</label>
-        <select id="storage_id" name="storage_id" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4">
+        <select id="storage_id" name="storage_id" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 dark:text-black">
             {% for storage in storages %}
                 <option value="{{ storage.id }}" {% if selected_storage.id == storage.id %}selected{% endif %}>{{ storage.name }}</option>
             {% endfor %}
         </select>
 
         <label for="expiration_date" class="block mb-2">{{ txt_expiration_date }}:</label>
-        <input type="date" id="expiration_date" name="expiration_date" required placeholder="{{ txt_enter_expiration_date}}" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4" />
+        <input type="date" id="expiration_date" name="expiration_date" required placeholder="{{ txt_enter_expiration_date}}" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 dark:text-black" />
 
         <!-- Add your easy accessible calendar here -->
         <div id="calendar">
-            <h3>{{this_month}}</h3>
+            <h3 class="font-extrabold">{{this_month}}</h3>
             <table>
                 <thead>
                     <tr>
@@ -37,7 +37,7 @@
                     {% endfor %}
                     {% for day,day_data in days.items() %}
                         {% if day_data[0] == first_of_month.month %}
-                            <td class="{% if day_data[2]<0 %}text-red-500{% endif %}">
+                            <td class="{% if day_data[2]<0 %}text-red-500{% else %} border border-gray-300 rounded-sm{% endif %}">
                                 <button type="button" onclick="getElementById('expiration_date').value='{{day.strftime("%Y-%m-%d")}}';getElementById('date_form').submit();" {% if day_data[2]<0 %}disabled{% endif %}>
                                     {{ day.strftime("%d.%m.") }} ({{ day_data[2] }})
                                 </button>
