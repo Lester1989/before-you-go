@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "before-you-go"
-version = "0.1.7"
+version = "0.1.8"
 description = ""
 authors = ["Lester <l.ester@gmx.de>"]
 readme = "README.md"
