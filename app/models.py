@@ -11,6 +11,7 @@ class Article(SQLModel, table=True):
     expiration_date: datetime = Field(default_factory= lambda: datetime.today() + timedelta(days=3))
     price: Optional[float] = Field(default=None)
     insertion_date: datetime = Field(default_factory= datetime.today)
+    quantity: Optional[int] = Field(default=1)
 
     @property
     def is_expired(self):

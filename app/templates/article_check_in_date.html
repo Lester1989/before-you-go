@@ -5,6 +5,15 @@
         <label for="name" class="block mb-2">{{ txt_article_name }}:</label>
         <input type="text" id="name" name="name" value="{{ name }}" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 dark:text-black" />
 
+        <label for="quantity" class="block mb-2">{{ txt_article_quantity }}:</label>
+        <input type="number" id="quantity" name="quantity" value="1" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 dark:text-black" />
+        <div>
+            <button type="button" onclick="getElementById('quantity').value=+getElementById('quantity').value-5;">- 5</button>
+            <button type="button" onclick="getElementById('quantity').value=+getElementById('quantity').value-1;">- 1</button>
+            <button type="button" onclick="getElementById('quantity').value=+getElementById('quantity').value+1;">+ 1</button>
+            <button type="button" onclick="getElementById('quantity').value=+getElementById('quantity').value+5;">+ 5</button>
+        </div>
+
         <label for="storage_id" class="block mb-2">{{ txt_storage}}:</label>
         <select id="storage_id" name="storage_id" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 dark:text-black">
             {% for storage in storages %}

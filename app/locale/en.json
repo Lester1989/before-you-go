@@ -1,6 +1,7 @@
 {
     "txt_actions": "Edit Expirationdate",
     "txt_article_name": "Article Name",
+    "txt_article_quantity": "quantity",
     "txt_barcode": "Barcode",
     "txt_cancel": "Cancel",
     "txt_check_in_articles": "Store Articles",
