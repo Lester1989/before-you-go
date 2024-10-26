@@ -14,10 +14,10 @@ from app.auth import create_access_token, get_current_user
 from app.controller_article import article_create, article_delete, article_list
 from app.controller_storage import storage_create, storage_delete
 from app.controller_user import user_create
-from app.models import Article, SQLModel, User, engine
+from app.models import Article, SQLModel, User
 from app.route_user import app as user_app
 from app.route_checkin import app as checkin_app
-from app.utility import flash, get_db, get_flashed_messages, get_translations, redirect_with_token, templates
+from app.utility import flash, get_db, get_flashed_messages, get_translations, redirect_with_token, templates, engine
 from app.validators import valid_article, valid_storage
 
 SQLModel.metadata.create_all(engine)
