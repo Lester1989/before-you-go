@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import Optional
 from datetime import datetime,timedelta
+from sqlmodel import create_engine
 from sqlmodel import Field, Session, SQLModel, select
-from app.utility import engine
 
 class Article(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -58,6 +58,7 @@ class BarCodeCache(SQLModel, table=True):
 
 
 def main():
+    engine = create_engine("sqlite:///database/database.db")
     SQLModel.metadata.create_all(engine)
     fridge = Storage(name="Fridge")
     user = User(name="John")
