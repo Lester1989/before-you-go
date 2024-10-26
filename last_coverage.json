@@ -1,16 +1,16 @@
 {
-    ".": 0.6992,
+    ".": 0.6883,
     "..__init__.py": 1.0,
     "..auth.py": 0.7522,
     "..controller.py": 1.0,
-    "..controller_article.py": 0.5814,
+    "..controller_article.py": 0.5556,
     "..controller_storage.py": 0.7097,
     "..controller_user.py": 0.4118,
     "..mail_sending.py": 0.3043,
     "..main.py": 0.8395,
     "..models.py": 0.6389,
-    "..route_checkin.py": 0.9434,
-    "..route_user.py": 0.5818,
+    "..route_checkin.py": 0.8,
+    "..route_user.py": 0.6034,
     "..utility.py": 0.9714,
     "..validators.py": 0.68
 }

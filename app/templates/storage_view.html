@@ -13,6 +13,7 @@
     <table class="mt-4 mx-4 border-collapse" id="{{string_to_slug(storage.name)}}">
         <thead class="dark:text-black">
             <tr>
+                <th class="py-2 px-4 border bg-gray-200 w-1/8">{{ txt_article_quantity }}</th>
                 <th class="py-2 px-4 border bg-gray-200 w-1/2">{{ txt_article_name }}</th>
                 <th class="py-2 px-4 border bg-gray-200 w-1/4">{{ txt_expiration_date }}</th>
                 <th class="py-2 px-4 border bg-gray-200 w-1/4">{{ txt_actions }}</th>
@@ -22,6 +23,12 @@
             {% for article in articles %}
                 {% if article.storage_id == storage.id %}
                     <tr>
+                        <td class="py-2 px-4 border w-1/8">
+                        {{ article.quantity }}
+                        <a href="/reduce_quantity/{{article.id}}" class="text-red-500 text-3xl font-extrabold hover:text-red-700 border border-red-500 rounded-md px-2 pt-0 pb-1">
+                            -
+                        </a>
+                        </td>
                         <td class="py-2 px-4 border w-1/2">{{ article.name }}</td>
                         {% if article.is_expired %}
                             <td class="py-2 px-4 border w-1/4 text-red-500">({{ -article.days_left }} {{ txt_days_over_due }}) {{ article.expiration_date.date() }}</td>

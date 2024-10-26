@@ -1,6 +1,7 @@
 import os
 from fastapi import APIRouter, Request, Form, Depends, status
 from fastapi.responses import RedirectResponse
+from sqlmodel import select
 
 from app.controller_user import user_activate, user_create, user_login, user_update
 from app.models import Session, User
@@ -39,6 +40,9 @@ async def login_view_post(
             flash(request,"Login success","success")
             return result
     except ValueError as e:
+        
+        users = db.exec(select(User)).all()
+        print(', '.join([user.name for user in users]))
         flash(request,f"Wrong Username or Password {e}","danger")
 
     return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)

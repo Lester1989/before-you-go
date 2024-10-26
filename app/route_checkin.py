@@ -8,10 +8,10 @@ from fastapi.responses import RedirectResponse
 
 from app.auth import create_access_token, get_current_user
 from app.controller import lookup_data
-from app.controller_article import article_create
+from app.controller_article import article_create, article_delete
 from app.models import Session, User
 from app.utility import flash, get_db, get_flashed_messages, get_translations, templates
-from app.validators import valid_storage
+from app.validators import valid_article, valid_storage
 
 app = APIRouter()
 
@@ -114,6 +114,26 @@ def calculate_calendar_dates():
         days[day] = (day.month, day.weekday(), (day - date.today()).days)
     return first_of_month, first_of_next_month, days
 
+@app.get("/reduce_quantity/{article_id}")
+async def reduce_quantity_view(
+    request: Request,
+    article_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if article := valid_article(db, article_id, user.id):
+        article.quantity -= 1
+        if article.quantity < 1:
+            article_delete(db, user.id, article_id)
+        db.commit()
+        flash(request, f"Quantity reduced to {article.quantity}", "success")
+    else:
+        flash(request, "Article not found", "danger")
+    result = RedirectResponse(url="/storage")
+    result.set_cookie(
+        key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
+    )
+    return result
 
 @app.post("/checkin_date")
 async def checkin_date_view_post(
@@ -121,14 +141,15 @@ async def checkin_date_view_post(
     name: str = Form(...),
     storage_id: int = Form(...),
     expiration_date: date = Form(...),
+    quantity: int = Form(1),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     storage = valid_storage(db, storage_id, user.id)
-    new_article = article_create(db, user.id, name, storage.id, expiration_date)
+    new_article = article_create(db, user.id, name, storage.id, expiration_date,quantity)
     flash(
         request,
-        f"Article added: {new_article.name} in {storage.name} with expiration date {new_article.expiration_date}",
+        f"Article added: {new_article.quantity}x {new_article.name} in {storage.name} with expiration date {new_article.expiration_date}",
         "success",
     )
     result = RedirectResponse(

@@ -13,13 +13,14 @@ def article_create(
     name: str,
     storage_id_or_name: str | int,
     expiration_date: date,
+    quantity: int = 1,
     price: Optional[float] = None,
 ):
     storage = valid_storage(session, storage_id_or_name, user_id)
     if not storage:
         raise ValueError("Invalid storage")
     article = Article(
-        name=name, storage_id=storage.id, price=price, expiration_date=expiration_date
+        name=name, storage_id=storage.id, price=price, expiration_date=expiration_date, quantity=quantity
     )
     session.add(article)
     session.commit()
@@ -52,6 +53,7 @@ def article_update(
     user_id: int,
     article_id: int,
     name: str = None,
+    quantity: int = None,
     storage_id_or_name: str | int = None,
     expiration_date: date = None,
     price: Optional[float] = None,
@@ -67,6 +69,8 @@ def article_update(
         article.expiration_date = expiration_date
     if price:
         article.price = price
+    if quantity:
+        article.quantity = quantity
     session.commit()
     session.refresh(article)
     return article
