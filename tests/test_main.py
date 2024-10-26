@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 import sys
 import unittest
 
@@ -281,7 +282,7 @@ class TestWebInterface(unittest.TestCase):
             "/checkin", cookies={"access_token": f"Bearer {self.token}"}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.text.count("<tr>"), len(articles) + 1)
+        self.assertEqual(response.text.count("<tr>"), len(articles) +1)
         # Add more assertions for the expected behavior
 
     def test_checkin_view_post(self):
@@ -349,8 +350,26 @@ class TestWebInterface(unittest.TestCase):
         # Add more assertions for the expected behavior
 
     def test_set_expiration_view(self):
-        response = self.client.get(
-            "/set_expiration/1/7", cookies={"access_token": f"Bearer {self.token}"}
+        with Session(engine) as session:
+            storage = storage_create(
+                session,
+                self.test_user.id,
+                "testFridge",
+            )
+            article = Article(
+                name="testMilk",
+                storage_id=storage.id,
+                expiration_date=date.today() + timedelta(days=10),
+            )
+            session.add(article)
+            session.commit()
+            session.refresh(article)
+        response = self.client.post(
+            "/set_expiration",
+            data={
+                "article_id": article.id,
+                "remaining_days": 10,
+            }, cookies={"access_token": f"Bearer {self.token}"}
         )
         self.assertEqual(response.status_code, 200)
         # Add more assertions for the expected behavior

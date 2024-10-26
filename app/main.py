@@ -14,10 +14,10 @@ from app.auth import create_access_token, get_current_user
 from app.controller_article import article_create, article_delete, article_list
 from app.controller_storage import storage_create, storage_delete
 from app.controller_user import user_create
-from app.models import SQLModel, User, engine
+from app.models import Article, SQLModel, User, engine
 from app.route_user import app as user_app
 from app.route_checkin import app as checkin_app
-from app.utility import flash, get_db, get_flashed_messages, get_translations, templates
+from app.utility import flash, get_db, get_flashed_messages, get_translations, redirect_with_token, templates
 from app.validators import valid_article, valid_storage
 
 SQLModel.metadata.create_all(engine)
@@ -37,6 +37,22 @@ app.include_router(user_app)
 app.include_router(checkin_app)
 app.include_router(auth_app)
 
+@app.get("/repair")
+async def repair_view(
+    request: Request,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)):
+    all_articles = db.exec(select(Article)).all()
+    repaired = 0
+    for article in all_articles:
+        if article.quantity is None:
+            article.quantity = 1
+            repaired += 1
+    db.commit()
+    flash(request, f"Repaired {repaired} Articles", "success")
+
+    return redirect_with_token(request, user,"/storage")
+
 
 @app.get("/storage")
 async def storage_view(
@@ -54,12 +70,28 @@ async def storage_view(
         | get_flashed_messages(request),
     )
 
+@app.get("/full_storage")
+async def full_storage_view(
+    request: Request,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    storages = user.storages(db)
+    articles = user.articles(db)
+    return templates.TemplateResponse(
+        request,
+        "full_storage_view.html",
+        {"storages": storages, "articles": articles, "user": user}
+        | get_translations(request)
+        | get_flashed_messages(request),
+    )
 
-@app.get("/set_expiration/{article_id}/{remaining_days}")
+
+@app.post("/set_expiration")
 async def set_expiration_view(
     request: Request,
-    article_id: int,
-    remaining_days: int,
+    article_id: int= Form(...),
+    remaining_days: int= Form(...),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -71,11 +103,21 @@ async def set_expiration_view(
             f"Expiration date updated to {article.expiration_date.strftime('%Y-%m-%d')}",
             "success",
         )
-    result = RedirectResponse(url="/storage")
-    result.set_cookie(
-        key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
-    )
-    return result
+    return redirect_with_token(request, user,"/storage",status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.post("/move_article")
+async def move_article(
+    request: Request,
+    article_id: int= Form(...),
+    storage_id: int = Form(...),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)):
+    if article := valid_article(db, article_id, user.id):
+        article.storage_id = storage_id
+        db.commit()
+        flash(request, f"Article moved to storage {storage_id}", "success")
+    return redirect_with_token(request, user,"/storage",status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/remove_article/{article_id}")
@@ -90,11 +132,7 @@ async def remove_article_view(
         flash(request, f"Article {article.name} removed", "success")
     else:
         flash(request, "Article not found", "danger")
-    result = RedirectResponse(url="/storage")
-    result.set_cookie(
-        key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
-    )
-    return result
+    return redirect_with_token(request, user,"/storage")
 
 
 @app.get("/remove_storage/{storage_id}")
@@ -116,11 +154,7 @@ async def remove_storage_view(
             flash(request, f"Storage {storage.name} removed", "success")
     else:
         flash(request, "Storage not found", "danger")
-    result = RedirectResponse(url="/storage")
-    result.set_cookie(
-        key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
-    )
-    return result
+    return redirect_with_token(request, user,"/storage")
 
 
 @app.post("/create_storage")
@@ -132,11 +166,7 @@ async def create_storage_view(
 ):
     storage_create(db, user.id, storage_name)
     flash(request, f"Storage {storage_name} created", "success")
-    result = RedirectResponse(url="/storage", status_code=status.HTTP_303_SEE_OTHER)
-    result.set_cookie(
-        key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
-    )
-    return result
+    return redirect_with_token(request, user,"/storage",status_code=status.HTTP_303_SEE_OTHER)
 
 @app.exception_handler(RequestValidationError)
 def request_error(request: Request, description: HTTPException):

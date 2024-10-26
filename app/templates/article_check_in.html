@@ -43,7 +43,7 @@
                                 <td class="py-2 px-4 border">{{ storage.name }}</td>
                             {% endif %}
                         {% endfor %}
-                        <td class="py-2 px-4 border">({{ article.days_left }} {{ txt_days_remaining }}) {{ article.expiration_date.date() }}</td>
+                        <td class="py-2 px-4 border">{{ article.expiration_date.date() }} ({{ article.days_left }} {{ txt_days_remaining }})</td>
                     </tr>
                 {% endfor %}
             </tbody>

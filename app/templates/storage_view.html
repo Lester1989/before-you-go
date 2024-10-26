@@ -13,10 +13,10 @@
     <table class="mt-4 mx-4 border-collapse" id="{{string_to_slug(storage.name)}}">
         <thead class="dark:text-black">
             <tr>
-                <th class="py-2 px-4 border bg-gray-200 w-1/8">{{ txt_article_quantity }}</th>
-                <th class="py-2 px-4 border bg-gray-200 w-1/2">{{ txt_article_name }}</th>
-                <th class="py-2 px-4 border bg-gray-200 w-1/4">{{ txt_expiration_date }}</th>
-                <th class="py-2 px-4 border bg-gray-200 w-1/4">{{ txt_actions }}</th>
+                <th class="py-2 px-4 border bg-gray-200 dark:text-black w-1/8">{{ txt_article_quantity }}</th>
+                <th class="py-2 px-4 border bg-gray-200 dark:text-black w-1/2">{{ txt_article_name }}</th>
+                <th class="py-2 px-4 border bg-gray-200 dark:text-black w-1/4">{{ txt_expiration_date }}</th>
+                <th class="py-2 px-4 border bg-gray-200 dark:text-black w-1/4">{{ txt_actions }}</th>
             </tr>
         </thead>
         <tbody>
@@ -33,7 +33,7 @@
                         {% if article.is_expired %}
                             <td class="py-2 px-4 border w-1/4 text-red-500">({{ -article.days_left }} {{ txt_days_over_due }}) {{ article.expiration_date.date() }}</td>
                         {% else %}
-                            <td class="py-2 px-4 border w-1/4">({{ article.days_left }} {{ txt_days_remaining }}) {{ article.expiration_date.date() }}</td>
+                            <td class="py-2 px-4 border w-1/4">{{ article.expiration_date.date() }} ({{ article.days_left }} {{ txt_days_remaining }})</td>
                         {% endif %}
                         <td class="py-2 px-4 border w-1/4">
                             <div class="flex flex-row">

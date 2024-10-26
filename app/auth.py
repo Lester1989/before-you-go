@@ -19,7 +19,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlmodel import Session, select
 
 from app.models import User
-from app.utility import get_db
+from app.utility import ALGORITHM, JWT_KEY, create_access_token, get_db
 
 
 # Hash a password using bcrypt
@@ -38,12 +38,6 @@ def verify_password(plain_password: str, hashed_password: str):
     )
 
 
-# get secret from environment variable
-JWT_KEY = os.environ.get(
-    "JWT_KEY", "".join(string.ascii_letters + string.digits for _ in range(32))
-)
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 180
 
 
 class UserResponse(BaseModel):
@@ -117,13 +111,6 @@ def authenticate_user(name: str, password: str,session:Session) -> User | bool:
         return user if verify_password(password, user.password_hash) else False
     return False
 
-
-def create_access_token(data: dict) -> str:
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode["exp"] = expire
-    result = jwt.encode(to_encode, JWT_KEY, algorithm=ALGORITHM)
-    return result
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme),db:Session=Depends(get_db)) -> User:

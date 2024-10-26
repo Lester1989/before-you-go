@@ -1,14 +1,32 @@
 
+from datetime import datetime, timedelta, timezone
+from fastapi.responses import RedirectResponse
 from sqlmodel import Session,create_engine
-from fastapi import Request
+from fastapi import Request,status
 import typing
 from fastapi.templating import Jinja2Templates
 import string
 import json
 import pathlib
+import os
+from jose import JWTError, jwt
 
 
 engine = create_engine("sqlite:///database/database.db")
+
+
+# get secret from environment variable
+JWT_KEY = os.environ.get(
+    "JWT_KEY", "".join(string.ascii_letters + string.digits for _ in range(32))
+)
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 180
+
+def create_access_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode["exp"] = expire
+    return jwt.encode(to_encode, JWT_KEY, algorithm=ALGORITHM)
 
 def get_db():
     with Session(engine) as session:
@@ -67,3 +85,9 @@ def get_translations(request: Request) -> dict[str, str]:
             return locales[clean_language]
     return locales["en"]
 
+def redirect_with_token(request: Request, user: "User",url:str,status_code:int=status.HTTP_303_SEE_OTHER) -> RedirectResponse:
+    result = RedirectResponse(url=url, status_code=status_code)
+    result.set_cookie(
+        key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
+    )
+    return result

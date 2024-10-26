@@ -10,10 +10,11 @@ from app.auth import create_access_token, get_current_user
 from app.controller import lookup_data
 from app.controller_article import article_create, article_delete
 from app.models import Session, User
-from app.utility import flash, get_db, get_flashed_messages, get_translations, templates
+from app.utility import flash, get_db, get_flashed_messages, get_translations, redirect_with_token, templates
 from app.validators import valid_article, valid_storage
 
 app = APIRouter()
+
 
 
 @app.get("/checkin")
@@ -52,17 +53,15 @@ async def checkin_view_post(
         name = lookup_data(db, barcode)
     elif not barcode and not name:
         raise ValueError("Barcode or name required")
-    storage = valid_storage(db, storage_id, user.id)
-    if not storage:
+    if storage := valid_storage(db, storage_id, user.id):
+        return redirect_with_token(
+            request,
+            user,
+            f"/checkin_date?name={urllib.parse.quote_plus(name)}&storage_id={storage.id}",
+            status_code=status.HTTP_303_SEE_OTHER)
+    else:
         raise ValueError("Invalid storage")
-    result = RedirectResponse(
-        url=f"/checkin_date?name={urllib.parse.quote_plus(name)}&storage_id={storage.id}",
-        status_code=status.HTTP_303_SEE_OTHER,
-    )
-    result.set_cookie(
-        key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
-    )
-    return result
+
 
 
 @app.get("/checkin_date")
@@ -129,11 +128,7 @@ async def reduce_quantity_view(
         flash(request, f"Quantity reduced to {article.quantity}", "success")
     else:
         flash(request, "Article not found", "danger")
-    result = RedirectResponse(url="/storage")
-    result.set_cookie(
-        key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
-    )
-    return result
+    return redirect_with_token(request, user,"/storage")
 
 @app.post("/checkin_date")
 async def checkin_date_view_post(
@@ -152,10 +147,9 @@ async def checkin_date_view_post(
         f"Article added: {new_article.quantity}x {new_article.name} in {storage.name} with expiration date {new_article.expiration_date}",
         "success",
     )
-    result = RedirectResponse(
-        url=f"/checkin?storage_id={storage_id}", status_code=status.HTTP_303_SEE_OTHER
-    )
-    result.set_cookie(
-        key="access_token", value=f'Bearer {create_access_token({"sub": user.name})}'
-    )
-    return result
+
+    return redirect_with_token(
+        request,
+        user,
+        url=f"/checkin?storage_id={storage_id}",
+        status_code=status.HTTP_303_SEE_OTHER)
